@@ -71,21 +71,23 @@ function getSlackUserName(parsedBody, success)
     return (
         (success ? 'Published:': 'Failed:') +
         ' ' +
-        (parsedBody.siteName || 'unknown') +
-        ' (' +
-        (parsedBody.id || '') +
-        ')'
+        (parsedBody.siteName || 'unknown')
     );
 }
 
 function getSlackText(parsedBody)
 {
+    var hostName = parsedBody.hostName
+    var id = parsedBody.id
     return (
         'Initiated by: ' +
         (parsedBody.author || 'unknown') +
         ' ' +
         (parsedBody.endTime || '') +
-        '\r\n```' +
+        '\r\n' +
+        (hostName ? '<https://' + hostName + '|' + hostName + '> ' : '') +
+        (id ? 'Id: ' + parsedBody.id + '\r\n' : '') +
+        '```' +
         (parsedBody.message || 'null message') +
         '```'
     );
