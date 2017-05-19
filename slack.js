@@ -17,7 +17,7 @@ function getSlackHookRequestOptions()
 
 function sendToSlack(parsedRequest, callback)
 {
-        if (!parsedRequest || (parsedRequest.body||'').trim()=='') {
+        if (!parsedRequest || (parsedRequest.body||'').trim()==='') {
             callback(true);
             return;
         }
@@ -40,10 +40,10 @@ function sendToSlack(parsedRequest, callback)
 function convertToSlackMessage(body, channel)
 {
     var parsedBody  = trParseBody(body);
-    var success     = (parsedBody.status=='success' && parsedBody.complete);
+    var success     = (parsedBody.status=='Success' || (parsedBody.status=='success' && parsedBody.complete));
     return JSON.stringify({
         username:   getSlackUserName(parsedBody, success),
-        icon_emoji: success ? ':shipit:' : ':warning:',
+        icon_emoji: success ? ':sun_small_cloud:' : ':rain_cloud:',
         text:       getSlackText(parsedBody),
         channel:    channel || process.env.slackchannel
     });
@@ -69,26 +69,27 @@ function trParseBody(body)
 function getSlackUserName(parsedBody, success)
 {
     return (
-        (success ? 'Published:': 'Failed:') +
-        ' ' +
-        (parsedBody.siteName || 'unknown')
+        parsedBody.job_name 
+        ? (success ? 'Completed: ' : 'Failed: ') + parsedBody.job_name 
+        : (success ? 'Published: ' : 'Failed: ') + parsedBody.siteName
     );
 }
 
 function getSlackText(parsedBody)
 {
-    var hostName = parsedBody.hostName
-    var id = parsedBody.id
+    var hookType = parsedBody.job_name ? 'TriggeredJobFinished' : 'PostDepolyment';
+    var hostName = parsedBody.hostName;
+    var jobName = parsedBody.job_name;
+    var jobDuration = parsedBody.duration ? parsedBody.duration.substring(0,8) : '';
+    var timeStamp = (parsedBody.endTime !== undefined ? parsedBody.endTime : (parsedBody.end_time !== undefined ? parsedBody.end_time : '')).substring(0,19).replace("T", " ");
+    var id = parsedBody.id;
+
     return (
-        'Initiated by: ' +
-        (parsedBody.author || 'unknown') +
-        ' ' +
-        (parsedBody.endTime || '') +
-        '\r\n' +
+        '>>> ' +
+        (hookType == 'TriggeredJobFinished' ? 'Scheduled, took ' + jobDuration : 'Pushed by ' + (parsedBody.author !== undefined ? parsedBody.author + ' at ' : 'unknown at ')
+        + timeStamp + '\r\n' +
         (hostName ? '<https://' + hostName + '|' + hostName + '> ' : '') +
-        (id ? 'Id: ' + parsedBody.id + '\r\n' : '') +
-        '```' +
-        (parsedBody.message || 'null message') +
-        '```'
+        (id ? 'Id: ' + parsedBody.id : '') +
+        (parsedBody.message ? '\r\n' + parsedBody.message : ''))
     );
 }
