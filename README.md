@@ -7,7 +7,7 @@ This is a very simple [Node.js](https://nodejs.org/) based [Azure](https://azure
 
 1. Set up an [incoming webhook integration](https://my.slack.com/services/new/incoming-webhook/) in your Slack team.
 2. Configure an environment variable named `slackhookuri` with the value of the above Slack web hook uri. In Azure you do it via the [application settings](https://azure.microsoft.com/en-us/documentation/articles/web-sites-configure/#application-settings) 
-3. Add the uri to your Azure web app Kudu portal web hooks, you reach it via `https://{your azure web app}.scm.azurewebsites.net/WebHooks`
+3. Add the uri to your Azure web app Kudu portal web hooks, you reach it via `https://{your azure web app}.scm.azurewebsites.net/webhooks`
 4. Optionally you can add an channel query parameter to the hook reuse the Slack hook and override which channel post deployment notifies to i.e.
 `https://{your azure web post deployment app}.azurewebsites.net/?channel=%40devlead`
 
