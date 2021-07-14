@@ -44,7 +44,7 @@ function convertToSlackMessage(body, channel)
     return JSON.stringify({
         username:   getSlackUserName(parsedBody, success),
         icon_emoji: success ? ':shipit:' : ':warning:',
-        text:       getSlackText(parsedBody),
+        text:       success ? getSlackText(parsedBody) : '@channel ' + getSlackText(parsedBody),
         channel:    channel || process.env.slackchannel
     });
 }
